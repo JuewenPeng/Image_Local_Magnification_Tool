@@ -99,10 +99,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def upload_images(self, priority):
         # if not self.image_paths:
-        self.image_paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open', '.', '*.jpg;;*.png;;All Files(*)')
+        self.image_paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open', '', '*.jpg;;*.png;;All Files(*)')
         # self.image_paths = [r'C:\Users\JuewenPeng\Desktop\fsdownload\bokeh_NR.jpg']
         if len(self.image_paths) != 0:
-            self.image = cv2.imread(self.image_paths[self.idx_image])
+            # self.image = cv2.imread(self.image_paths[self.idx_image])
+            self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), -1)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
             self.check_range(priority)
             self.crop_resize_image()
@@ -113,7 +114,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if self.image_preview is None:
             QtWidgets.QMessageBox.warning(self, 'Message', 'No images to save!', QtWidgets.QMessageBox.Ok)
             return
-        self.save_dir = QtWidgets.QFileDialog.getExistingDirectory(self, 'Choose directory to save', '.')
+        self.save_dir = QtWidgets.QFileDialog.getExistingDirectory(self, 'Choose directory to save', '')
         if self.save_dir == '':
             return
 
@@ -127,9 +128,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.preview_image()
             save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + self.ui.lineEdit_suffix.text())
             try:
-                cv2.imwrite(save_path, cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))
+                # cv2.imwrite(save_path, cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))
+                cv2.imencode(self.ui.lineEdit_suffix.text(),
+                             cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))[1].tofile(save_path)
             except cv2.error:
-                QtWidgets.QMessageBox.warning(self, 'Message', 'Image file format wrong!', QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Message', 'Image file format is wrong!', QtWidgets.QMessageBox.Ok)
                 return
 
         QtWidgets.QMessageBox.information(self, 'Message', 'Done saving!', QtWidgets.QMessageBox.Ok)
