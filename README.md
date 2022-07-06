@@ -3,7 +3,21 @@ A tool to magnify the local areas of images.
 
 ![image](./demo.jpg)
 
+# Requirements:
+
+PyQt5, numpy, cv2
+
+<br>
+
 # Usage:
+
+run `main.bat` on Windows or
+```
+python main.py
+```
+
+<br>
+
 - `upload images` : upload one or several images
 - `save results` : choose the diretory to save
   - `prefix` : text added to the beginning of the original image name (e.g. "mag_")
@@ -21,7 +35,7 @@ A tool to magnify the local areas of images.
 - `mag 1/2/3/4` : push the button to activate different magnification windows
 - `color 1/2/3/4` : color of the boundary line of the magnification windows (default color or hex color codes)
 - `keyboard Esc` : focrcely lose focus for all widgets
-- `keyboard Q/E` : switch to other uploaded images (after losing focus)
-- `keyboard W/S/A/D` : fine-tune the position of the magnified area (after losing focus)
+- `keyboard Q/E` : switch to other uploaded images (conditioned on losing focus)
+- `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on losing focus)
 
 After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
