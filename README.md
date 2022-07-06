@@ -7,8 +7,6 @@ A tool to magnify the local areas of images.
 
 PyQt5, numpy, cv2
 
-<br>
-
 # Usage:
 
 run `main.bat` on Windows or
@@ -16,7 +14,6 @@ run `main.bat` on Windows or
 python main.py
 ```
 
-<br>
 
 - `upload images` : upload one or several images
 - `save results` : choose the diretory to save
@@ -39,3 +36,5 @@ python main.py
 - `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on losing focus)
 
 After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
+
+If you encounter any bug, please feel free to contact me or create an issue.
