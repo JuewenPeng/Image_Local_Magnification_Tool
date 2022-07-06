@@ -24,4 +24,4 @@ A tool to magnify the local areas of images.
 - `keyboard Q/E` : switch to other uploaded images (after losing focus)
 - `keyboard W/S/A/D` : fine-tune the position of the magnified area (after losing focus)
 
-After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceed the range of the whole image, the corresponding magnification window will not display.
+After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
