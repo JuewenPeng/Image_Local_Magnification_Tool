@@ -126,7 +126,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.crop_resize_image()
             self.preview_image()
             save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + self.ui.lineEdit_suffix.text())
-            cv2.imwrite(save_path, cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))
+            try:
+                cv2.imwrite(save_path, cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))
+            except cv2.error:
+                QtWidgets.QMessageBox.warning(self, 'Message', 'Image file format wrong!', QtWidgets.QMessageBox.Ok)
+                return
 
         QtWidgets.QMessageBox.information(self, 'Message', 'Done saving!', QtWidgets.QMessageBox.Ok)
 
@@ -236,29 +240,60 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.ui.spinBox_resX.setValue(resX)
             self.ui.spinBox_resY.setValue(resY)
 
-
         # interval
-        if self.ui.spinBox_intervalX.value() < 2:
-            self.ui.spinBox_intervalX.setValue(2)
-        elif self.ui.spinBox_intervalX.value() > int(0.2 * self.ui.spinBox_resX.value()):
-            self.ui.spinBox_intervalX.setValue(int(0.2 * self.ui.spinBox_resX.value()))
+        if self.ui.spinBox_num.value() > 1:
+            numMag = self.ui.spinBox_num.value()
+            if self.ui.spinBox_intervalX.value() < -int(0.5 * self.ui.spinBox_resX.value()):
+                self.ui.spinBox_intervalX.setValue(-int(0.5 * self.ui.spinBox_resX.value()))
+            elif self.ui.spinBox_intervalX.value() > int(0.5 / (numMag-1) * self.ui.spinBox_resX.value()):
+                self.ui.spinBox_intervalX.setValue(int(0.5 / (numMag-1) * self.ui.spinBox_resX.value()))
 
-        if self.ui.spinBox_intervalY.value() < 2:
-            self.ui.spinBox_intervalY.setValue(2)
-        elif self.ui.spinBox_intervalY.value() > int(0.2 * self.ui.spinBox_resY.value()):
-            self.ui.spinBox_intervalY.setValue(int(0.2 * self.ui.spinBox_resY.value()))
+            if self.ui.spinBox_intervalY.value() < -int(0.5 * self.ui.spinBox_resY.value()):
+                self.ui.spinBox_intervalY.setValue(-int(0.5 * self.ui.spinBox_resY.value()))
+            elif self.ui.spinBox_intervalY.value() > int(0.5 / (numMag-1) * self.ui.spinBox_resY.value()):
+                self.ui.spinBox_intervalY.setValue(int(0.5 / (numMag-1) * self.ui.spinBox_resY.value()))
+        else:
+            if self.ui.spinBox_intervalX.value() < -int(0.9 * self.ui.spinBox_resX.value()):
+                self.ui.spinBox_intervalX.setValue(-int(0.9 * self.ui.spinBox_resX.value()))
+            elif self.ui.spinBox_intervalX.value() > int(0.9 * self.ui.spinBox_resX.value()):
+                self.ui.spinBox_intervalX.setValue(int(0.9 * self.ui.spinBox_resX.value()))
+
+            if self.ui.spinBox_intervalY.value() < -int(0.9 * self.ui.spinBox_resY.value()):
+                self.ui.spinBox_intervalY.setValue(-int(0.9 * self.ui.spinBox_resY.value()))
+            elif self.ui.spinBox_intervalY.value() > int(0.9 * self.ui.spinBox_resY.value()):
+                self.ui.spinBox_intervalY.setValue(int(0.9 * self.ui.spinBox_resY.value()))
 
         # border
-        if self.ui.spinBox_border.value() < -int(0.5 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())):
-            self.ui.spinBox_border.setValue(-int(0.5 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())))
-        elif self.ui.spinBox_border.value() > int(0.3 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())):
-            self.ui.spinBox_border.setValue(int(0.3 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())))
+        if self.ui.spinBox_num.value() > 1:
+            if int(self.ui.comboBox_position.currentIndex()) < 2:  # 0: up; 1: down; 2: left; 3: right
+                if self.ui.spinBox_border.value() < -int(0.5 * self.ui.spinBox_resX.value()):
+                    self.ui.spinBox_border.setValue(-int(0.5 * self.ui.spinBox_resX.value()))
+
+                elif self.ui.spinBox_border.value() > int(0.2 * self.ui.spinBox_resX.value()):
+                    self.ui.spinBox_border.setValue(int(0.2 * self.ui.spinBox_resX.value()))
+            else:
+                if self.ui.spinBox_border.value() < -int(0.5 * self.ui.spinBox_resY.value()):
+                    self.ui.spinBox_border.setValue(-int(0.5 * self.ui.spinBox_resY.value()))
+
+                elif self.ui.spinBox_border.value() > int(0.2 * self.ui.spinBox_resY.value()):
+                    self.ui.spinBox_border.setValue(int(0.2 * self.ui.spinBox_resY.value()))
+        else:
+            if int(self.ui.comboBox_position.currentIndex()) < 2:  # 0: up; 1: down; 2: left; 3: right
+                if self.ui.spinBox_border.value() < -int(0.5 * self.ui.spinBox_resX.value()):
+                    self.ui.spinBox_border.setValue(-int(0.5 * self.ui.spinBox_resX.value()))
+                elif self.ui.spinBox_border.value() > int(0.4 * self.ui.spinBox_resX.value()):
+                    self.ui.spinBox_border.setValue(int(0.4 * self.ui.spinBox_resX.value()))
+            else:
+                if self.ui.spinBox_border.value() < -int(0.5 * self.ui.spinBox_resY.value()):
+                    self.ui.spinBox_border.setValue(-int(0.5 * self.ui.spinBox_resY.value()))
+                elif self.ui.spinBox_border.value() > int(0.4 * self.ui.spinBox_resY.value()):
+                    self.ui.spinBox_border.setValue(int(0.4 * self.ui.spinBox_resY.value()))
 
         # linewidth
         if self.ui.spinBox_linewidth.value() < 2:
             self.ui.spinBox_linewidth.setValue(2)
-        elif self.ui.spinBox_linewidth.value() > int(0.03 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())):
-            self.ui.spinBox_linewidth.setValue(int(0.03 * max(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())))
+        elif self.ui.spinBox_linewidth.value() > int(0.05 * min(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())):
+            self.ui.spinBox_linewidth.setValue(int(0.05 * min(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())))
 
         # aspect ratio
         if float(self.ui.lineEdit_ratio.text()) < 0.2:
@@ -323,6 +358,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if self.image_resize is None:
             return
         if self.ui.spinBox_num.value() == 0:
+            self.ui.textBrowser_message.setText('')
             self.image_preview = self.image_resize
             return
 
@@ -338,26 +374,37 @@ class MyMainWindow(QtWidgets.QMainWindow):
         magnification = float(self.ui.lineEdit_magnification.text())
         numMag = int(self.ui.spinBox_num.value())
 
-        if position < 2:
-            wMAG_resize = int((w_resize - 2*border - (numMag-1)*intervalX - 2*numMag*linewidthHalf) / numMag)
-            hMAG_resize = int(wMAG_resize / aspectRatioMag)
-            w_preview = max(w_resize, w_resize - 2*border)
-            h_preview = h_resize + hMAG_resize + intervalY + 2*linewidthHalf
-        elif position < 4:
-            hMAG_resize = int((h_resize - 2*border - (numMag-1)*intervalY - 2*numMag*linewidthHalf) / numMag)
-            wMAG_resize = int(hMAG_resize * aspectRatioMag)
-            h_preview = max(h_resize, h_resize - 2*border)
-            w_preview = w_resize + wMAG_resize + intervalX + 2*linewidthHalf
+        if numMag > 1:
+            if position < 2:
+                wMAG_resize = int((w_resize - 2*border - (numMag-1)*intervalX - 2*numMag*linewidthHalf) / numMag)
+                hMAG_resize = int(wMAG_resize / aspectRatioMag)
+                w_preview = max(w_resize, w_resize - 2 * border)
+                h_preview = max(h_resize, h_resize + hMAG_resize + intervalY + 2 * linewidthHalf)
+            else:
+                hMAG_resize = int((h_resize - 2*border - (numMag-1)*intervalY - 2*numMag*linewidthHalf) / numMag)
+                wMAG_resize = int(hMAG_resize * aspectRatioMag)
+                h_preview = max(h_resize, h_resize - 2 * border)
+                w_preview = max(w_resize, w_resize + wMAG_resize + intervalX + 2 * linewidthHalf)
         else:
-            raise NotImplementedError(f'"position={position}" Error!')
+            if position < 2:
+                wMAG_resize = int(w_resize - 2 * border - 2 * numMag * linewidthHalf)
+                hMAG_resize = int(wMAG_resize / aspectRatioMag)
+                w_preview = max(w_resize, w_resize // 2 + abs(intervalX) + wMAG_resize // 2 + linewidthHalf)
+                h_preview = max(h_resize, h_resize + hMAG_resize + intervalY + 2 * linewidthHalf)
+            else:
+                hMAG_resize = int(h_resize - 2*border - 2*numMag*linewidthHalf)
+                wMAG_resize = int(hMAG_resize * aspectRatioMag)
+                h_preview = max(h_resize, h_resize//2 + abs(intervalY) + hMAG_resize//2 + linewidthHalf)
+                w_preview = max(w_resize, w_resize + wMAG_resize + intervalX + 2 * linewidthHalf)
 
         hMag_resize = hMAG_resize / magnification
         wMag_resize = wMAG_resize / magnification
 
-        # if hMag_resize < 1 and wMag_resize < 1:
-        #     msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Message', 'The size of the magnified areas are smaller than 1px. Please modify the parameters')
-        #     msg_box.exec_()
-        #     return
+        if hMag_resize < 1 and wMag_resize < 1:
+            # QtWidgets.QMessageBox.warning(self, 'Message', 'The size of the magnified areas are smaller than 1px.',
+            #                               QtWidgets.QMessageBox.Ok)
+            self.ui.textBrowser_message.setText('The size of the magnification window is smaller than 1px.')
+            return
 
         h_crop, w_crop = self.image_crop.shape[:2]
         wMag_crop = w_crop / w_resize * wMag_resize
@@ -366,14 +413,39 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.image_preview = 255 * np.ones((h_preview, w_preview, 3))
 
         # draw original image
-        if position == 0:
-            self.image_preview[hMAG_resize + intervalY + 2*linewidthHalf:, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
-        elif position == 1:
-            self.image_preview[:-hMAG_resize - intervalY - 2*linewidthHalf, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
-        elif position == 2:
-            self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, wMAG_resize + intervalX + 2*linewidthHalf:] = self.image_resize
+        if numMag > 1:
+            if position == 0:
+                xStart = (w_preview - w_resize) // 2
+                yStart = max(0, hMAG_resize + intervalY + 2*linewidthHalf)
+                # self.image_preview[hMAG_resize + intervalY + 2*linewidthHalf:, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
+            elif position == 1:
+                xStart = (w_preview - w_resize) // 2
+                yStart = 0
+                # self.image_preview[:h_resize, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
+            elif position == 2:
+                xStart = max(0, wMAG_resize + intervalX + 2*linewidthHalf)
+                yStart = (h_preview - h_resize) // 2
+                # self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, wMAG_resize + intervalX + 2*linewidthHalf:] = self.image_resize
+            else:
+                xStart = 0
+                yStart = (h_preview - h_resize) // 2
+                # self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, :w_resize] = self.image_resize
         else:
-            self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, :-wMAG_resize - intervalX - 2*linewidthHalf] = self.image_resize
+            if position == 0:
+                xStart = max(0, linewidthHalf + wMAG_resize//2 - intervalX - w_resize//2)
+                yStart = max(0, hMAG_resize + intervalY + 2*linewidthHalf)
+            elif position == 1:
+                xStart = max(0, linewidthHalf + wMAG_resize//2 - intervalX - w_resize//2)
+                yStart = 0
+            elif position == 2:
+                xStart = max(0, wMAG_resize + intervalX + 2*linewidthHalf)
+                yStart = max(0, linewidthHalf + hMAG_resize//2 - intervalY - h_resize//2)
+            else:
+                xStart = 0
+                yStart = max(0, linewidthHalf + hMAG_resize//2 - intervalY - h_resize//2)
+        xEnd = xStart + w_resize
+        yEnd = yStart + h_resize
+        self.image_preview[yStart: yEnd, xStart: xEnd] = self.image_resize
 
         for idx_mag in range(self.ui.spinBox_num.value()):
             # idx_color = eval(f'self.ui.comboBox_color{idx_mag+1}.currentIndex()')
@@ -417,26 +489,35 @@ class MyMainWindow(QtWidgets.QMainWindow):
             xCenter = w_resize * ratioRelativeOffsetX
             yCenter = h_resize * ratioRelativeOffsetY
 
-            if position == 0:
-                xStart = int(xCenter - wMag_resize//2) + (w_preview-w_resize) // 2
-                xEnd = int(xStart + wMag_resize)
-                yStart = int(yCenter - hMag_resize//2) + hMAG_resize + intervalY + 2*linewidthHalf
-                yEnd = int(yStart + hMag_resize)
-            elif position == 1:
-                xStart = int(xCenter - wMag_resize//2) + (w_preview-w_resize) // 2
-                xEnd = int(xStart + wMag_resize)
-                yStart = int(yCenter - hMag_resize//2)
-                yEnd = int(yStart + hMag_resize)
-            elif position == 2:
-                xStart = int(xCenter - wMag_resize//2) + wMAG_resize + intervalX + 2*linewidthHalf
-                xEnd = int(xStart + wMag_resize)
-                yStart = int(yCenter - hMag_resize//2) + (h_preview-h_resize) // 2
-                yEnd = int(yStart + hMag_resize)
+            if numMag > 1:
+                if position == 0:
+                    xStart = int(xCenter - wMag_resize//2) + (w_preview - w_resize) // 2
+                    yStart = int(yCenter - hMag_resize//2) + max(0, hMAG_resize + intervalY + 2*linewidthHalf)
+                elif position == 1:
+                    xStart = int(xCenter - wMag_resize//2) + (w_preview - w_resize) // 2
+                    yStart = int(yCenter - hMag_resize//2)
+                elif position == 2:
+                    xStart = int(xCenter - wMag_resize//2) + max(0, wMAG_resize + intervalX + 2*linewidthHalf)
+                    yStart = int(yCenter - hMag_resize//2) + (h_preview - h_resize) // 2
+                else:
+                    xStart = int(xCenter - wMag_resize//2)
+                    yStart = int(yCenter - hMag_resize//2) + (h_preview - h_resize) // 2
             else:
-                xStart = int(xCenter - wMag_resize//2)
-                xEnd = int(xStart + wMag_resize)
-                yStart = int(yCenter - hMag_resize//2) + (h_preview-h_resize) // 2
-                yEnd = int(yStart + hMag_resize)
+                if position == 0:
+                    xStart = int(xCenter - wMag_resize//2) + max(0, linewidthHalf + wMAG_resize//2 - intervalX - w_resize//2)
+                    yStart = int(yCenter - hMag_resize//2) + max(0, hMAG_resize + intervalY + 2*linewidthHalf)
+                elif position == 1:
+                    xStart = int(xCenter - wMag_resize//2) + max(0, linewidthHalf + wMAG_resize//2 - intervalX - w_resize//2)
+                    yStart = int(yCenter - hMag_resize//2)
+                elif position == 2:
+                    xStart = int(xCenter - wMag_resize//2) + max(0, wMAG_resize + intervalX + 2*linewidthHalf)
+                    yStart = int(yCenter - hMag_resize//2) + max(0, linewidthHalf + hMAG_resize//2 - intervalY - h_resize//2)
+                else:
+                    xStart = int(xCenter - wMag_resize//2)
+                    yStart = int(yCenter - hMag_resize//2) + max(0, linewidthHalf + hMAG_resize//2 - intervalY - h_resize//2)
+
+            xEnd = int(xStart + wMag_resize)
+            yEnd = int(yStart + hMag_resize)
 
             if xStart < linewidthHalf or yStart < linewidthHalf or xEnd-1 >= w_preview-linewidthHalf or yEnd-1 >= h_preview-linewidthHalf:
                 self.ui.textBrowser_message.setText(f'The size or position of "mag {idx_mag+1}" is out of range.')
@@ -445,7 +526,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
 
-            # draw magnified areas
+            # draw magnification windows
             xCenter = w_crop * ratioRelativeOffsetX
             yCenter = h_crop * ratioRelativeOffsetY
             xStart = int(xCenter - wMag_crop//2)
@@ -456,26 +537,35 @@ class MyMainWindow(QtWidgets.QMainWindow):
             mag_crop = self.image_crop[yStart: yEnd, xStart: xEnd]
             mag_resize = cv2.resize(mag_crop, (wMAG_resize, hMAG_resize), interpolation=cv2.INTER_LINEAR)
 
-            if position == 0:
-                xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
-                xEnd = xStart + wMAG_resize
-                yStart = linewidthHalf
-                yEnd = yStart + hMAG_resize
-            elif position == 1:
-                xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
-                xEnd = xStart + wMAG_resize
-                yStart = h_resize + intervalY + linewidthHalf
-                yEnd = yStart + hMAG_resize
-            elif position == 2:
-                xStart = linewidthHalf
-                xEnd = xStart + wMAG_resize
-                yStart = max(border, 0) + linewidthHalf + idx_mag * (intervalY + hMAG_resize + 2*linewidthHalf)
-                yEnd = yStart + hMAG_resize
+            if numMag > 1:
+                if position == 0:
+                    xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
+                    yStart = linewidthHalf
+                elif position == 1:
+                    xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
+                    yStart = h_resize + intervalY + linewidthHalf
+                elif position == 2:
+                    xStart = linewidthHalf
+                    yStart = max(border, 0) + linewidthHalf + idx_mag * (intervalY + hMAG_resize + 2*linewidthHalf)
+                else:
+                    xStart = w_resize + intervalX + linewidthHalf
+                    yStart = max(border, 0) + linewidthHalf + idx_mag * (intervalY + hMAG_resize + 2*linewidthHalf)
             else:
-                xStart = w_resize + intervalX + linewidthHalf
-                xEnd = xStart + wMAG_resize
-                yStart = max(border, 0) + linewidthHalf + idx_mag * (intervalY + hMAG_resize + 2*linewidthHalf)
-                yEnd = yStart + hMAG_resize
+                if position == 0:
+                    xStart = linewidthHalf + max(0, w_resize//2 + intervalX - wMAG_resize//2 - linewidthHalf)
+                    yStart = linewidthHalf + max(0, -intervalY - hMAG_resize - 2*linewidthHalf)
+                elif position == 1:
+                    xStart = linewidthHalf + max(0, w_resize//2 + intervalX - wMAG_resize//2 - linewidthHalf)
+                    yStart = h_resize + intervalY + linewidthHalf
+                elif position == 2:
+                    xStart = linewidthHalf + max(0, -intervalX - wMAG_resize - 2*linewidthHalf)
+                    yStart = linewidthHalf + max(0, h_resize//2 + intervalY - linewidthHalf - hMAG_resize//2)
+                else:
+                    xStart = w_resize + intervalX + linewidthHalf
+                    yStart = linewidthHalf + max(0, h_resize//2 + intervalY - linewidthHalf - hMAG_resize//2)
+
+            xEnd = xStart + wMAG_resize
+            yEnd = yStart + hMAG_resize
 
             self.image_preview[yStart: yEnd, xStart: xEnd] = mag_resize
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
