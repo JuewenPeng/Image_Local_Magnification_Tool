@@ -1371,7 +1371,7 @@
            </font>
           </property>
           <property name="text">
-           <string>location</string>
+           <string>position</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1525,7 +1525,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QComboBox" name="comboBox_location">
+         <widget class="QComboBox" name="comboBox_position">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>

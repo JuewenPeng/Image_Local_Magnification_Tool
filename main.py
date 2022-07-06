@@ -80,7 +80,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.lineEdit_ratio.editingFinished.connect(partial(self.check_preview_show_image, 'x'))
         self.ui.lineEdit_magnification.editingFinished.connect(partial(self.check_preview_show_image, 'x'))
         self.ui.spinBox_num.editingFinished.connect(partial(self.check_preview_show_image, 'x'))
-        self.ui.comboBox_location.currentIndexChanged.connect(partial(self.check_preview_show_image, 'x'))
+        self.ui.comboBox_position.currentIndexChanged.connect(partial(self.check_preview_show_image, 'x'))
 
         self.ui.comboBox_color1.currentIndexChanged.connect(partial(self.check_preview_show_image, 'x'))
         self.ui.comboBox_color2.currentIndexChanged.connect(partial(self.check_preview_show_image, 'x'))
@@ -326,7 +326,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.image_preview = self.image_resize
             return
 
-        location = int(self.ui.comboBox_location.currentIndex())  # 0: up; 1: down; 2: left; 3: right
+        position = int(self.ui.comboBox_position.currentIndex())  # 0: up; 1: down; 2: left; 3: right
         w_resize, h_resize = int(self.ui.spinBox_resX.value()), int(self.ui.spinBox_resY.value())
         ratioCropTop, ratioCropBottom = self.ui.spinBox_cropTop.value() / 100, self.ui.spinBox_cropBottom.value() / 100
         ratioCropLeft, ratioCropRight = self.ui.spinBox_cropLeft.value() / 100, self.ui.spinBox_cropRight.value() / 100
@@ -338,18 +338,18 @@ class MyMainWindow(QtWidgets.QMainWindow):
         magnification = float(self.ui.lineEdit_magnification.text())
         numMag = int(self.ui.spinBox_num.value())
 
-        if location < 2:
+        if position < 2:
             wMAG_resize = int((w_resize - 2*border - (numMag-1)*intervalX - 2*numMag*linewidthHalf) / numMag)
             hMAG_resize = int(wMAG_resize / aspectRatioMag)
             w_preview = max(w_resize, w_resize - 2*border)
             h_preview = h_resize + hMAG_resize + intervalY + 2*linewidthHalf
-        elif location < 4:
+        elif position < 4:
             hMAG_resize = int((h_resize - 2*border - (numMag-1)*intervalY - 2*numMag*linewidthHalf) / numMag)
             wMAG_resize = int(hMAG_resize * aspectRatioMag)
             h_preview = max(h_resize, h_resize - 2*border)
             w_preview = w_resize + wMAG_resize + intervalX + 2*linewidthHalf
         else:
-            raise NotImplementedError(f'"location={location}" Error!')
+            raise NotImplementedError(f'"position={position}" Error!')
 
         hMag_resize = hMAG_resize / magnification
         wMag_resize = wMAG_resize / magnification
@@ -366,11 +366,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.image_preview = 255 * np.ones((h_preview, w_preview, 3))
 
         # draw original image
-        if location == 0:
+        if position == 0:
             self.image_preview[hMAG_resize + intervalY + 2*linewidthHalf:, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
-        elif location == 1:
+        elif position == 1:
             self.image_preview[:-hMAG_resize - intervalY - 2*linewidthHalf, (w_preview-w_resize)//2: (w_preview-w_resize)//2+w_resize] = self.image_resize
-        elif location == 2:
+        elif position == 2:
             self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, wMAG_resize + intervalX + 2*linewidthHalf:] = self.image_resize
         else:
             self.image_preview[(h_preview-h_resize)//2: (h_preview-h_resize)//2+h_resize, :-wMAG_resize - intervalX - 2*linewidthHalf] = self.image_resize
@@ -417,17 +417,17 @@ class MyMainWindow(QtWidgets.QMainWindow):
             xCenter = w_resize * ratioRelativeOffsetX
             yCenter = h_resize * ratioRelativeOffsetY
 
-            if location == 0:
+            if position == 0:
                 xStart = int(xCenter - wMag_resize//2) + (w_preview-w_resize) // 2
                 xEnd = int(xStart + wMag_resize)
                 yStart = int(yCenter - hMag_resize//2) + hMAG_resize + intervalY + 2*linewidthHalf
                 yEnd = int(yStart + hMag_resize)
-            elif location == 1:
+            elif position == 1:
                 xStart = int(xCenter - wMag_resize//2) + (w_preview-w_resize) // 2
                 xEnd = int(xStart + wMag_resize)
                 yStart = int(yCenter - hMag_resize//2)
                 yEnd = int(yStart + hMag_resize)
-            elif location == 2:
+            elif position == 2:
                 xStart = int(xCenter - wMag_resize//2) + wMAG_resize + intervalX + 2*linewidthHalf
                 xEnd = int(xStart + wMag_resize)
                 yStart = int(yCenter - hMag_resize//2) + (h_preview-h_resize) // 2
@@ -439,7 +439,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 yEnd = int(yStart + hMag_resize)
 
             if xStart < linewidthHalf or yStart < linewidthHalf or xEnd-1 >= w_preview-linewidthHalf or yEnd-1 >= h_preview-linewidthHalf:
-                self.ui.textBrowser_message.setText(f'The size or location of "mag {idx_mag+1}" is out of range.')
+                self.ui.textBrowser_message.setText(f'The size or position of "mag {idx_mag+1}" is out of range.')
                 warning = True
                 continue
 
@@ -456,17 +456,17 @@ class MyMainWindow(QtWidgets.QMainWindow):
             mag_crop = self.image_crop[yStart: yEnd, xStart: xEnd]
             mag_resize = cv2.resize(mag_crop, (wMAG_resize, hMAG_resize), interpolation=cv2.INTER_LINEAR)
 
-            if location == 0:
+            if position == 0:
                 xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
                 xEnd = xStart + wMAG_resize
                 yStart = linewidthHalf
                 yEnd = yStart + hMAG_resize
-            elif location == 1:
+            elif position == 1:
                 xStart = max(border, 0) + linewidthHalf + idx_mag * (intervalX + wMAG_resize + 2*linewidthHalf)
                 xEnd = xStart + wMAG_resize
                 yStart = h_resize + intervalY + linewidthHalf
                 yEnd = yStart + hMAG_resize
-            elif location == 2:
+            elif position == 2:
                 xStart = linewidthHalf
                 xEnd = xStart + wMAG_resize
                 yStart = max(border, 0) + linewidthHalf + idx_mag * (intervalY + hMAG_resize + 2*linewidthHalf)
