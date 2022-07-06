@@ -22,7 +22,7 @@ python main.py
 - `reset` : reset all settings
 - `resolution-x/y` (range: 128~4096px, aspect ratio is preserved): resolution of the processed image (do not consider the magnification windows)
 - `crop top/bottom/left/down` (range: 0~80%): crop ratio
-- `interval-x/y` (can be negative): distance between the adjacent magnification windows (denotes relative offset when the number of magnification windows is set to 1) or distance between the original image and magnification windows
+- `interval-x/y` (can be negative): distance between the original image and magnification windows or distance between the adjacent magnification windows (denotes relative offset when the number of magnification windows is set to 1)
 - `border` (can be negative): distance between the boundary of the magnification windows and that of the original image
 - `linewidth` : boundary line width of the magnification windows
 - `aspect ratio` (range: 0.2~5.0): aspect ratio of the magnification windows
