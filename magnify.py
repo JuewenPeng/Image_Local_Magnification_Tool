@@ -1138,4 +1138,4 @@ class Ui_MainWindow(object):
         self.label_24.setText(_translate("MainWindow", "image name:"))
         self.label_27.setText(_translate("MainWindow", "message:"))
         self.label_25.setText(_translate("MainWindow", "Q/E:  previous/next image,    1/2/3/4:  activate \"mag 1/2/3/4\""))
-        self.label_26.setText(_translate("MainWindow", "W/S/A/D:  \"mag\" up/down/left/right,             Esc:  lose focus"))
+        self.label_26.setText(_translate("MainWindow", "W/S/A/D:  \"mag\" up/down/left/right,       Esc:  remove focus"))

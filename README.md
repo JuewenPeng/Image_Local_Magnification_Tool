@@ -31,9 +31,10 @@ python main.py
 - `position`: position of the magnification windows
 - `mag 1/2/3/4` : push the button to activate different magnification windows
 - `color 1/2/3/4` (default color or hex color codes): boundary line color of the magnification windows
-- `keyboard Esc` : focrcely lose focus for all widgets
-- `keyboard Q/E` : switch to other uploaded images (conditioned on losing focus)
-- `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on losing focus)
+- `keyboard Esc` : remove focus for all widgets
+- `keyboard Q/E` : switch to other uploaded images (conditioned on removing focus)
+- `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on removing focus)
+- `keyboard 1/2/3/4` : activate different magnification windows (conditioned on removing focus)
 
 After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
 

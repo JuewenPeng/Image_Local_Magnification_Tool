@@ -2497,7 +2497,7 @@
            </font>
           </property>
           <property name="text">
-           <string>W/S/A/D:  &quot;mag&quot; up/down/left/right,             Esc:  lose focus</string>
+           <string>W/S/A/D:  &quot;mag&quot; up/down/left/right,       Esc:  remove focus</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
