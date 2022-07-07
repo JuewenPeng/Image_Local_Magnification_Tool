@@ -37,4 +37,4 @@ python main.py
 
 After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
 
-If you encounter any bug, please feel free to contact me or create an issue.
+If you encounter any bug or have any advice, please feel free to create an issue.

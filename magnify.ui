@@ -79,6 +79,42 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="1" column="0" colspan="2">
+         <widget class="QPushButton" name="pushButton_save">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>240</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>save</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0" colspan="2">
          <widget class="QPushButton" name="pushButton_reset">
           <property name="sizePolicy">
@@ -115,8 +151,8 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QPushButton" name="pushButton_save">
+        <item row="0" column="0" colspan="2">
+         <widget class="QPushButton" name="pushButton_upload">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -147,7 +183,7 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>save results</string>
+           <string>upload</string>
           </property>
          </widget>
         </item>
@@ -161,7 +197,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>112</width>
             <height>40</height>
            </size>
           </property>
@@ -200,7 +236,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>110</width>
             <height>40</height>
            </size>
           </property>
@@ -216,7 +252,7 @@
            </font>
           </property>
           <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
+           <enum>Qt::RightToLeft</enum>
           </property>
           <property name="text">
            <string>.jpg</string>
@@ -226,42 +262,6 @@
           </property>
           <property name="placeholderText">
            <string>suffix</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QPushButton" name="pushButton_upload">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>240</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>240</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>upload images</string>
           </property>
          </widget>
         </item>
@@ -1634,7 +1634,7 @@
       <item>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_locate1">
+         <widget class="QPushButton" name="pushButton_position1">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1680,7 +1680,7 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QPushButton" name="pushButton_locate4">
+         <widget class="QPushButton" name="pushButton_position4">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1796,7 +1796,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QPushButton" name="pushButton_locate2">
+         <widget class="QPushButton" name="pushButton_position2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1842,7 +1842,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_locate3">
+         <widget class="QPushButton" name="pushButton_position3">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -2376,13 +2376,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>120</width>
+          <width>110</width>
           <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>120</width>
+          <width>110</width>
           <height>16777215</height>
          </size>
         </property>
@@ -2396,7 +2396,7 @@
          <string>message:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -2446,7 +2446,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>600</width>
+            <width>650</width>
             <height>40</height>
            </size>
           </property>
@@ -2463,7 +2463,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Q: previous image,   E: next image</string>
+           <string>Q/E:  previous/next image,    1/2/3/4:  activate &quot;mag 1/2/3/4&quot;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -2480,7 +2480,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>600</width>
+            <width>650</width>
             <height>40</height>
            </size>
           </property>
@@ -2497,7 +2497,7 @@
            </font>
           </property>
           <property name="text">
-           <string>W: mag up,   S: mag down,   A: mag left,   D: mag right</string>
+           <string>W/S/A/D:  &quot;mag&quot; up/down/left/right,             Esc:  lose focus</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

@@ -1,8 +1,9 @@
 import sys
-from PyQt5 import QtCore, QtMultimedia, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui
 from functools import partial
 
 import os
+import json
 import numpy as np
 import cv2
 
@@ -26,7 +27,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyMainWindow, self).__init__()
         self.ui = magnify.Ui_MainWindow()
-        self.initialize()
+        # self.initialize()
 
     # def comboBoxTextCenter(self):
     #     items = self.ui.centralwidget.findChildren(QtWidgets.QComboBox)
@@ -34,7 +35,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
     #         item.setEditable(True)
     #         item.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
 
-    def initialize(self):
+    # def initialize(self):
         self.ui.setupUi(self)
 
         self.display_ratio = 0.9
@@ -48,7 +49,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.image_preview = None
         self.idx_image = 0
 
-        self.ratioOffset = 0.5 * np.ones((self.ui.spinBox_num.maximum(), 2))
+        # self.ratioOffset = 0.5 * np.ones((self.ui.spinBox_num.maximum(), 2))
+        self.ratioOffset = [[0.5, 0.5] for _ in range(self.ui.spinBox_num.maximum())]
         self.color_history = [0] * self.ui.spinBox_num.maximum()
 
         for i in range(self.ui.spinBox_num.maximum()):
@@ -89,7 +91,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         self.ui.graphicsView_selectarea.viewport().installEventFilter(self)
 
-        self.check_range('x')
+        # self.check_range('x')
 
         # if hasattr(self, 'image_path'):
         #     self.upload_images('x')
@@ -97,18 +99,103 @@ class MyMainWindow(QtWidgets.QMainWindow):
         #     self.image_paths = ''
         #     self.image = None
 
+    def obtain_ckpt(self):
+        ckpt = dict()
+        ckpt['prefix'] = self.ui.lineEdit_prefix.text()
+        ckpt['suffix'] = self.ui.lineEdit_suffix.text()
+        ckpt['resX'] = self.ui.spinBox_resX.value()
+        ckpt['resY'] = self.ui.spinBox_resY.value()
+        ckpt['cropTop'] = self.ui.spinBox_cropTop.value()
+        ckpt['cropBottom'] = self.ui.spinBox_cropBottom.value()
+        ckpt['cropLeft'] = self.ui.spinBox_cropLeft.value()
+        ckpt['cropRight'] = self.ui.spinBox_cropRight.value()
+        ckpt['intervalX'] = self.ui.spinBox_intervalX.value()
+        ckpt['intervalY'] = self.ui.spinBox_intervalY.value()
+        ckpt['border'] = self.ui.spinBox_border.value()
+        ckpt['linewidth'] = self.ui.spinBox_linewidth.value()
+        ckpt['ratio'] = self.ui.lineEdit_ratio.text()
+        ckpt['magnification'] = self.ui.lineEdit_magnification.text()
+        ckpt['num'] = self.ui.spinBox_num.value()
+        ckpt['position1'] = self.ui.pushButton_position1.isChecked()
+        ckpt['position2'] = self.ui.pushButton_position2.isChecked()
+        ckpt['position3'] = self.ui.pushButton_position3.isChecked()
+        ckpt['position4'] = self.ui.pushButton_position4.isChecked()
+        ckpt['color1'] = self.ui.comboBox_color1.currentText()
+        ckpt['color2'] = self.ui.comboBox_color2.currentText()
+        ckpt['color3'] = self.ui.comboBox_color3.currentText()
+        ckpt['color4'] = self.ui.comboBox_color4.currentText()
+        ckpt['ratioOffset'] = self.ratioOffset
+        return ckpt
+
+    def load_ckpt(self, ckpt):
+        self.ui.lineEdit_prefix.setText(ckpt['prefix'])
+        self.ui.lineEdit_suffix.setText(ckpt['suffix'])
+        self.ui.spinBox_resX.setValue(ckpt['resX'])
+        self.ui.spinBox_resY.setValue(ckpt['resY'])
+        self.ui.spinBox_cropTop.setValue(ckpt['cropTop'])
+        self.ui.spinBox_cropBottom.setValue(ckpt['cropBottom'])
+        self.ui.spinBox_cropLeft.setValue(ckpt['cropLeft'])
+        self.ui.spinBox_cropRight.setValue(ckpt['cropRight'])
+        self.ui.spinBox_intervalX.setValue(ckpt['intervalX'])
+        self.ui.spinBox_intervalY.setValue(ckpt['intervalY'])
+        self.ui.spinBox_border.setValue(ckpt['border'])
+        self.ui.spinBox_linewidth.setValue(ckpt['linewidth'])
+        self.ui.lineEdit_ratio.setText(ckpt['ratio'])
+        self.ui.lineEdit_magnification.setText(ckpt['magnification'])
+        self.ui.spinBox_num.setValue(ckpt['num'])
+        self.ui.pushButton_position1.setChecked(ckpt['position1'])
+        self.ui.pushButton_position2.setChecked(ckpt['position2'])
+        self.ui.pushButton_position3.setChecked(ckpt['position3'])
+        self.ui.pushButton_position4.setChecked(ckpt['position4'])
+        self.ui.comboBox_color1.setCurrentText(ckpt['color1'])
+        self.ui.comboBox_color2.setCurrentText(ckpt['color2'])
+        self.ui.comboBox_color3.setCurrentText(ckpt['color3'])
+        self.ui.comboBox_color4.setCurrentText(ckpt['color4'])
+        self.ratioOffset = ckpt['ratioOffset']
+
     def upload_images(self, priority):
         # if not self.image_paths:
-        self.image_paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open', '', '*.jpg;;*.png;;All Files(*)')
-        # self.image_paths = [r'C:\Users\JuewenPeng\Desktop\fsdownload\bokeh_NR.jpg']
-        if len(self.image_paths) != 0:
-            # self.image = cv2.imread(self.image_paths[self.idx_image])
-            self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), -1)
+        paths, _ = QtWidgets.QFileDialog.getOpenFileNames(
+            self, 'Open', '', '*.bmp *.dib *.jpeg *.jpg *.jpe *.png *.tiff *.tif *.json'
+        )
+        if not paths:
+            return
+        image_paths = []
+        num_ckpt = 0
+        for path in paths:
+            if path.endswith('.json'):
+                if num_ckpt == 0:
+                    with open(path, 'r', encoding='utf-8') as f:
+                        ckpt = json.load(f)
+                    try:
+                        self.load_ckpt(ckpt)
+                    except TypeError:
+                        QtWidgets.QMessageBox.warning(self, 'Message', 'The checkpoint cannot be loaded!', QtWidgets.QMessageBox.Ok)
+                        return
+                    num_ckpt += 1
+                elif num_ckpt == 1:
+                    QtWidgets.QMessageBox.warning(self, 'Message', 'More than 1 checkpoint file have been uploaded. The first one is loaded!', QtWidgets.QMessageBox.Ok)
+                    num_ckpt += 1
+            else:
+                image_paths.append(path)
+        if len(image_paths) == 0:
+            if self.image is not None:
+                self.check_cropresize_preview_show_image(priority)
+            return
+        else:
+            self.image_paths = image_paths
+
+        # self.image_paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open', '', '*.jpg;;*.png;;All Files(*)')
+        # if len(self.image_paths) != 0:
+
+        # self.image = cv2.imread(self.image_paths[self.idx_image])
+        try:
+            self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), cv2.IMREAD_COLOR)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-            self.check_range(priority)
-            self.crop_resize_image()
-            self.preview_image()
-            self.show_image()
+        except cv2.error:
+            QtWidgets.QMessageBox.warning(self, 'Message', 'The image cannot be read!', QtWidgets.QMessageBox.Ok)
+            return
+        self.check_cropresize_preview_show_image(priority)
 
     def save_results(self):
         if self.image_preview is None:
@@ -118,31 +205,60 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if self.save_dir == '':
             return
 
+        ckpt = self.obtain_ckpt()
+
+        image_path = self.image_paths[0]
+        image_name = os.path.splitext(os.path.split(image_path)[1])[0]
+        save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + '.json')
+        with open(save_path, 'w', encoding='utf-8') as fw:
+            json.dump(ckpt, fw, indent=4, ensure_ascii=False)
+
+        to_overwrite = None
+
         for i in range(len(self.image_paths)):
             image_path = self.image_paths[i]
             image_name = os.path.splitext(os.path.split(image_path)[1])[0]
+            save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + self.ui.lineEdit_suffix.text())
+
             self.image = cv2.imread(image_path)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
             self.check_range('x')
             self.crop_resize_image()
             self.preview_image()
-            save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + self.ui.lineEdit_suffix.text())
+
+            if os.path.exists(save_path):
+                if to_overwrite is None:
+                    reply = QtWidgets.QMessageBox.question(self, 'Message',
+                                                           'Some image files exist. Are you sure to overwrite them?',
+                                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                           QtWidgets.QMessageBox.No)
+                    if reply == QtWidgets.QMessageBox.Yes:
+                        to_overwrite = True
+                    else:
+                        to_overwrite = False
+                        continue
+                elif to_overwrite is True:
+                    pass
+                else:
+                    continue
+
             try:
                 # cv2.imwrite(save_path, cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))
                 cv2.imencode(self.ui.lineEdit_suffix.text(),
                              cv2.cvtColor(self.image_preview.astype(np.uint8), cv2.COLOR_RGB2BGR))[1].tofile(save_path)
             except cv2.error:
-                QtWidgets.QMessageBox.warning(self, 'Message', 'Image file format is wrong!', QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Message', 'Image file format is unsupported!', QtWidgets.QMessageBox.Ok)
                 return
 
         QtWidgets.QMessageBox.information(self, 'Message', 'Done saving!', QtWidgets.QMessageBox.Ok)
 
-    def reset(self):
-        reply = QtWidgets.QMessageBox.question(self, 'Message', 'Aro you sure to reset?',
-                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                               QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.No:
-            return
+    def reset(self, ckpt_path=None):
+        if not ckpt_path:
+            reply = QtWidgets.QMessageBox.question(self, 'Message', 'Aro you sure to reset?',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
+            if reply == QtWidgets.QMessageBox.No:
+                return
         self.ui.lineEdit_prefix.setText('mag_')
         self.ui.lineEdit_suffix.setText('.jpg')
         self.ui.spinBox_resX.setValue(720)
@@ -158,11 +274,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.lineEdit_ratio.setText('1.5')
         self.ui.lineEdit_magnification.setText('4.0')
         self.ui.spinBox_num.setValue(2)
-        self.ui.pushButton_locate1.setChecked(True)
-        self.ui.comboBox_color1.setCurrentIndex(0)
-        self.ui.comboBox_color2.setCurrentIndex(1)
-        self.ui.comboBox_color3.setCurrentIndex(2)
-        self.ui.comboBox_color4.setCurrentIndex(3)
+        self.ui.pushButton_position1.setChecked(True)
+        # self.ui.comboBox_color1.setCurrentIndex(0)
+        # self.ui.comboBox_color2.setCurrentIndex(1)
+        # self.ui.comboBox_color3.setCurrentIndex(2)
+        # self.ui.comboBox_color4.setCurrentIndex(3)
+        self.ui.comboBox_color1.setCurrentText('red')
+        self.ui.comboBox_color2.setCurrentText('green')
+        self.ui.comboBox_color3.setCurrentText('yellow')
+        self.ui.comboBox_color4.setCurrentText('blue')
 
         self.check_cropresize_preview_show_image('x')
 
@@ -299,24 +419,30 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.ui.spinBox_linewidth.setValue(int(0.05 * min(self.ui.spinBox_resX.value(), self.ui.spinBox_resY.value())))
 
         # aspect ratio
-        if float(self.ui.lineEdit_ratio.text()) < 0.2:
-            self.ui.lineEdit_ratio.setText('0.2')
-        elif float(self.ui.lineEdit_ratio.text()) > 5.0:
-            self.ui.lineEdit_ratio.setText('5.0')
+        try:
+            if float(self.ui.lineEdit_ratio.text()) < 0.2:
+                self.ui.lineEdit_ratio.setText('0.2')
+            elif float(self.ui.lineEdit_ratio.text()) > 5.0:
+                self.ui.lineEdit_ratio.setText('5.0')
+        except ValueError:
+            self.ui.lineEdit_ratio.setText('2.0')
 
         # magnification
-        if float(self.ui.lineEdit_magnification.text()) < 1.0:
-            self.ui.lineEdit_magnification.setText('1.0')
-        elif float(self.ui.lineEdit_magnification.text()) > 10.0:
-            self.ui.lineEdit_magnification.setText('10.0')
+        try:
+            if float(self.ui.lineEdit_magnification.text()) < 1.0:
+                self.ui.lineEdit_magnification.setText('1.0')
+            elif float(self.ui.lineEdit_magnification.text()) > 10.0:
+                self.ui.lineEdit_magnification.setText('10.0')
+        except ValueError:
+            self.ui.lineEdit_magnification.setText('4.0')
 
         # mag number
         for i in range(self.ui.spinBox_num.maximum()):
             if i < self.ui.spinBox_num.value():
-                eval(f'self.ui.pushButton_locate{i+1}.setEnabled(True)')
+                eval(f'self.ui.pushButton_position{i+1}.setEnabled(True)')
                 eval(f'self.ui.comboBox_color{i+1}.setEnabled(True)')
             else:
-                eval(f'self.ui.pushButton_locate{i+1}.setEnabled(False)')
+                eval(f'self.ui.pushButton_position{i+1}.setEnabled(False)')
                 eval(f'self.ui.comboBox_color{i+1}.setEnabled(False)')
 
     def crop_resize_image(self):
@@ -634,12 +760,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
                 idx_mag_select = 0
                 for idx_mag in range(self.ui.spinBox_num.value()):
-                    if eval(f'self.ui.pushButton_locate{idx_mag+1}.isChecked()'):
+                    if eval(f'self.ui.pushButton_position{idx_mag+1}.isChecked()'):
                         idx_mag_select = idx_mag
                         break
 
-                self.ratioOffset[idx_mag_select, 0] = ratioOffsetY
-                self.ratioOffset[idx_mag_select, 1] = ratioOffsetX
+                self.ratioOffset[idx_mag_select][0] = ratioOffsetY
+                self.ratioOffset[idx_mag_select][1] = ratioOffsetX
 
                 self.preview_image()
                 self.show_image()
@@ -670,7 +796,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             if self.image_resize is not None:
                 idx_mag_select = 0
                 for idx_mag in range(self.ui.spinBox_num.value()):
-                    if eval(f'self.ui.pushButton_locate{idx_mag+1}.isChecked()'):
+                    if eval(f'self.ui.pushButton_position{idx_mag+1}.isChecked()'):
                         idx_mag_select = idx_mag
                         break
                 ratioOffsetX, ratioOffsetY = 0, 0
@@ -691,10 +817,32 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 else:
                     ratioOffsetX = 0.001 * kx
 
-                self.ratioOffset[idx_mag_select, 0] += ratioOffsetY
-                self.ratioOffset[idx_mag_select, 1] += ratioOffsetX
+                self.ratioOffset[idx_mag_select][0] += ratioOffsetY
+                self.ratioOffset[idx_mag_select][1] += ratioOffsetX
 
                 self.check_preview_show_image('x')
+
+        elif event.key() in [QtCore.Qt.Key_1, QtCore.Qt.Key_2, QtCore.Qt.Key_3, QtCore.Qt.Key_4]:
+            if event.key() == QtCore.Qt.Key_1:
+                if self.ui.spinBox_num.value() > 0:
+                    self.ui.pushButton_position1.setChecked(True)
+                else:
+                    self.ui.textBrowser_message.setText('"mag 1" is disabled')
+            elif event.key() == QtCore.Qt.Key_2:
+                if self.ui.spinBox_num.value() > 1:
+                    self.ui.pushButton_position2.setChecked(True)
+                else:
+                    self.ui.textBrowser_message.setText('"mag 2" is disabled')
+            elif event.key() == QtCore.Qt.Key_3:
+                if self.ui.spinBox_num.value() > 2:
+                    self.ui.pushButton_position3.setChecked(True)
+                else:
+                    self.ui.textBrowser_message.setText('"mag 3" is disabled')
+            else:
+                if self.ui.spinBox_num.value() > 3:
+                    self.ui.pushButton_position2.setChecked(True)
+                else:
+                    self.ui.textBrowser_message.setText('"mag 4" is disabled')
 
         elif event.key() == QtCore.Qt.Key_Escape:
             items = self.ui.centralwidget.findChildren(QtWidgets.QWidget)
