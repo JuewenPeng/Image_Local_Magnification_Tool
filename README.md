@@ -32,7 +32,7 @@ python main.py
 - `mag 1/2/3/4` : push the button to activate different magnification windows
 - `color 1/2/3/4` (default color or hex color codes): boundary line color of the magnification windows
 - `keyboard Esc` : remove focus for all widgets
-- `keyboard Q/E` : switch to other uploaded images (conditioned on removing focus)
+- `keyboard Q/E` or `mouse scrolling up/down`: switch to other uploaded images (conditioned on removing focus)
 - `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on removing focus)
 - `keyboard 1/2/3/4` : activate different magnification windows (conditioned on removing focus)
 

@@ -28,15 +28,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyMainWindow, self).__init__()
         self.ui = magnify.Ui_MainWindow()
-        # self.initialize()
-
-    # def comboBoxTextCenter(self):
-    #     items = self.ui.centralwidget.findChildren(QtWidgets.QComboBox)
-    #     for item in items:
-    #         item.setEditable(True)
-    #         item.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
-
-    # def initialize(self):
         self.ui.setupUi(self)
 
         self.display_ratio = 0.9
@@ -95,11 +86,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         self.check_range('x')
 
-        # if hasattr(self, 'image_path'):
-        #     self.upload_images('x')
-        # else:
-        #     self.image_paths = ''
-        #     self.image = None
+    # def comboBoxTextCenter(self):
+    #     items = self.ui.centralwidget.findChildren(QtWidgets.QComboBox)
+    #     for item in items:
+    #         item.setEditable(True)
+    #         item.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
 
     def obtain_ckpt(self):
         ckpt = dict()
@@ -902,6 +893,26 @@ class MyMainWindow(QtWidgets.QMainWindow):
             items = self.ui.centralwidget.findChildren(QtWidgets.QWidget)
             for item in items:
                 item.clearFocus()
+
+    def wheelEvent(self, event):
+        length = len(self.image_paths)
+        if length > 0:
+            if event.angleDelta().y() > 0:
+                if self.idx_image > 0:
+                    self.idx_image -= 1
+                else:
+                    self.ui.textBrowser_message.setText('This is the first image.')
+                    return
+            elif event.angleDelta().y() < 0:
+                if self.idx_image < length - 1:
+                    self.idx_image += 1
+                else:
+                    self.ui.textBrowser_message.setText('This is the last image.')
+                    return
+            self.image = cv2.imread(self.image_paths[self.idx_image])
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+            self.check_cropresize_preview_show_image('x')
+
 
     def resizeEvent(self, event):
         self.show_image()
