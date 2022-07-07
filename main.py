@@ -826,7 +826,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     if self.idx_image > 0:
                         self.idx_image -= 1
                     else:
-                        if self.ui.textBrowser_message.toPlainText()
                         self.ui.textBrowser_message.setText('This is the first image.')
                         return
                 elif event.key() == QtCore.Qt.Key_E:
