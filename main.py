@@ -780,13 +780,13 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     if self.idx_image > 0:
                         self.idx_image -= 1
                     else:
-                        self.ui.textBrowser_message.setText('This is the first image.')
+                        # self.ui.textBrowser_message.setText('This is the first image.')
                         return
                 elif event.key() == QtCore.Qt.Key_E:
                     if self.idx_image < length - 1:
                         self.idx_image += 1
                     else:
-                        self.ui.textBrowser_message.setText('This is the last image.')
+                        # self.ui.textBrowser_message.setText('This is the last image.')
                         return
                 self.image = cv2.imread(self.image_paths[self.idx_image])
                 self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
