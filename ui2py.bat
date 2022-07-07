@@ -1,0 +1,1 @@
+pyuic5 -o magnify.py magnify.ui
