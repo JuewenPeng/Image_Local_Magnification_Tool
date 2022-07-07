@@ -36,6 +36,6 @@ python main.py
 - `keyboard W/S/A/D` : fine-tune the position of the magnified area (conditioned on removing focus)
 - `keyboard 1/2/3/4` : activate different magnification windows (conditioned on removing focus)
 
-After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the size or position of the magnified area exceeds the range of the whole image, the corresponding magnification window will not display.
+After activating one magnification window, you can click the center of the magnified area in the left image to determine where to magnifiy. If the magnified area exceeds the range of the cropped original image, the corresponding magnification window will not display.
 
 If you encounter any bug or have any advice, please feel free to create an issue.

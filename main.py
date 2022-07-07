@@ -4,6 +4,7 @@ from functools import partial
 
 import os
 import json
+import copy
 import numpy as np
 import cv2
 
@@ -51,6 +52,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         # self.ratioOffset = 0.5 * np.ones((self.ui.spinBox_num.maximum(), 2))
         self.ratioOffset = [[0.5, 0.5] for _ in range(self.ui.spinBox_num.maximum())]
+        self.ratioOffset_history = copy.deepcopy(self.ratioOffset)
         self.color_history = [0] * self.ui.spinBox_num.maximum()
 
         for i in range(self.ui.spinBox_num.maximum()):
@@ -91,7 +93,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         self.ui.graphicsView_selectarea.viewport().installEventFilter(self)
 
-        # self.check_range('x')
+        self.check_range('x')
 
         # if hasattr(self, 'image_path'):
         #     self.upload_images('x')
@@ -152,6 +154,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.comboBox_color3.setCurrentText(ckpt['color3'])
         self.ui.comboBox_color4.setCurrentText(ckpt['color4'])
         self.ratioOffset = ckpt['ratioOffset']
+        self.ratioOffset_history = copy.deepcopy(self.ratioOffset)
 
     def upload_images(self, priority):
         # if not self.image_paths:
@@ -482,8 +485,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def preview_image(self):
 
-        warning = False
-
         if self.image_resize is None:
             return
         if self.ui.spinBox_num.value() == 0:
@@ -576,7 +577,10 @@ class MyMainWindow(QtWidgets.QMainWindow):
         yEnd = yStart + h_resize
         self.image_preview[yStart: yEnd, xStart: xEnd] = self.image_resize
 
+        warning = False
+
         for idx_mag in range(self.ui.spinBox_num.value()):
+
             # idx_color = eval(f'self.ui.comboBox_color{idx_mag+1}.currentIndex()')
             text = eval(f'self.ui.comboBox_color{idx_mag+1}.currentText()')
 
@@ -648,10 +652,50 @@ class MyMainWindow(QtWidgets.QMainWindow):
             xEnd = int(xStart + wMag_resize)
             yEnd = int(yStart + hMag_resize)
 
-            if xStart < linewidthHalf or yStart < linewidthHalf or xEnd-1 >= w_preview-linewidthHalf or yEnd-1 >= h_preview-linewidthHalf:
-                self.ui.textBrowser_message.setText(f'The size or position of "mag {idx_mag+1}" is out of range.')
+            if wMag_resize + 2 * linewidthHalf > w_resize or hMag_resize + 2 * linewidthHalf > h_resize:
                 warning = True
                 continue
+
+            if xStart < linewidthHalf or xEnd > w_resize-linewidthHalf or yStart < linewidthHalf or yEnd > h_resize-linewidthHalf:
+                if xStart < linewidthHalf:
+                    xStart = linewidthHalf
+                    xEnd = int(xStart + wMag_resize)
+                    xCenter = xStart + wMag_resize / 2
+                elif xEnd > w_resize - linewidthHalf:
+                    xEnd = w_resize - linewidthHalf
+                    xStart = int(xEnd - wMag_resize)
+                    xCenter = xEnd - wMag_resize / 2
+                if yStart < linewidthHalf:
+                    yStart = linewidthHalf
+                    yEnd = int(yStart + hMag_resize)
+                    yCenter = yStart + hMag_resize / 2
+                elif yEnd > h_resize - linewidthHalf:
+                    yEnd = h_resize - linewidthHalf
+                    yStart = int(yEnd - hMag_resize)
+                    yCenter = yEnd - hMag_resize / 2
+
+                ratioRelativeOffsetX = xCenter / w_resize
+                ratioRelativeOffsetY = yCenter / h_resize
+
+                ratioOffsetY = ratioCropTop + ratioRelativeOffsetY * (1 - ratioCropTop - ratioCropBottom)
+                ratioOffsetX = ratioCropLeft + ratioRelativeOffsetX * (1 - ratioCropLeft - ratioCropRight)
+                self.ratioOffset[idx_mag] = [ratioOffsetY, ratioOffsetX]
+
+                # if xStart < linewidthHalf or yStart < linewidthHalf or xEnd > w_resize-linewidthHalf or yEnd > h_resize-linewidthHalf:
+                #     warning_times += 1
+                #     global_warning_times += 1
+                # else:
+                #     break
+
+            # if warning_times == 0:
+            #     self.ratioOffset_history[idx_mag] = copy.deepcopy(self.ratioOffset[idx_mag])
+            # elif warning_times == 1:
+            #     self.ratioOffset[idx_mag] = copy.deepcopy(self.ratioOffset_history[idx_mag])
+            #     self.ui.textBrowser_message.setText(f'The position of "mag {idx_mag+1}" is out of range. Keep the previous one.')
+            # elif warning_times == 2:
+            #     self.ratioOffset[idx_mag] = copy.deepcopy(self.ratioOffset_history[idx_mag])
+            #     self.ui.textBrowser_message.setText(f'The size of "mag {idx_mag + 1}" is out of range. Do not display.')
+            #     continue
 
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
 
@@ -701,6 +745,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         if warning is False:
             self.ui.textBrowser_message.setText('Succeed to magnify.')
+        else:
+            self.ui.textBrowser_message.setText(f'Magnified areas are out of range. Do not display.')
 
     def show_image_in_graphicsview(self, image, graphicsView):
         if image is None:
@@ -780,13 +826,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     if self.idx_image > 0:
                         self.idx_image -= 1
                     else:
-                        # self.ui.textBrowser_message.setText('This is the first image.')
+                        if self.ui.textBrowser_message.toPlainText()
+                        self.ui.textBrowser_message.setText('This is the first image.')
                         return
                 elif event.key() == QtCore.Qt.Key_E:
                     if self.idx_image < length - 1:
                         self.idx_image += 1
                     else:
-                        # self.ui.textBrowser_message.setText('This is the last image.')
+                        self.ui.textBrowser_message.setText('This is the last image.')
                         return
                 self.image = cv2.imread(self.image_paths[self.idx_image])
                 self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
@@ -825,24 +872,32 @@ class MyMainWindow(QtWidgets.QMainWindow):
         elif event.key() in [QtCore.Qt.Key_1, QtCore.Qt.Key_2, QtCore.Qt.Key_3, QtCore.Qt.Key_4]:
             if event.key() == QtCore.Qt.Key_1:
                 if self.ui.spinBox_num.value() > 0:
-                    self.ui.pushButton_position1.setChecked(True)
+                    if not self.ui.pushButton_position1.isChecked():
+                        self.ui.pushButton_position1.setChecked(True)
+                        self.ui.textBrowser_message.setText('"mag 1" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 1" is disabled')
+                    self.ui.textBrowser_message.setText('"mag 1" is disabled.')
             elif event.key() == QtCore.Qt.Key_2:
                 if self.ui.spinBox_num.value() > 1:
-                    self.ui.pushButton_position2.setChecked(True)
+                    if not self.ui.pushButton_position2.isChecked():
+                        self.ui.pushButton_position2.setChecked(True)
+                        self.ui.textBrowser_message.setText('"mag 2" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 2" is disabled')
+                    self.ui.textBrowser_message.setText('"mag 2" is disabled.')
             elif event.key() == QtCore.Qt.Key_3:
                 if self.ui.spinBox_num.value() > 2:
-                    self.ui.pushButton_position3.setChecked(True)
+                    if not self.ui.pushButton_position3.isChecked():
+                        self.ui.pushButton_position3.setChecked(True)
+                        self.ui.textBrowser_message.setText('"mag 3" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 3" is disabled')
+                    self.ui.textBrowser_message.setText('"mag 3" is disabled.')
             else:
                 if self.ui.spinBox_num.value() > 3:
-                    self.ui.pushButton_position2.setChecked(True)
+                    if not self.ui.pushButton_position4.isChecked():
+                        self.ui.pushButton_position4.setChecked(True)
+                        self.ui.textBrowser_message.setText('"mag 4" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 4" is disabled')
+                    self.ui.textBrowser_message.setText('"mag 4" is disabled.')
 
         elif event.key() == QtCore.Qt.Key_Escape:
             items = self.ui.centralwidget.findChildren(QtWidgets.QWidget)
