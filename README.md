@@ -15,8 +15,8 @@ python main.py
 ```
 
 
-- `upload images` : upload one or several images
-- `save results` : choose the diretory to save
+- `upload` : upload one or several images; upload checkpoint file (".json") to restore previous settings
+- `save` : choose the diretory to save results and checkpoint file
   - `prefix` : text added to the beginning of the original image name (e.g. "mag_")
   - `suffix` : image file format added to the end of the original image name (e.g. ".jpg")
 - `reset` : reset all settings
