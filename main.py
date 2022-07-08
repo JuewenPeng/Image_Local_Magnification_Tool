@@ -776,7 +776,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if self.image_resize is not None and self.ui.spinBox_num.value() > 0:
             self.ui.graphicsView_selectarea.setCursor(QtCore.Qt.CrossCursor)
             graphview = self.ui.graphicsView_selectarea
-            if event.type() == QtCore.QEvent.MouseButtonPress and source == graphview.viewport():
+            if event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.RightButton and source == graphview.viewport():
                 # image_h, image_w = self.image_resize.shape[:2]
                 y_mouse, x_mouse = event.y(), event.x()
                 h_graphview, w_graphview = graphview.height(), graphview.width()

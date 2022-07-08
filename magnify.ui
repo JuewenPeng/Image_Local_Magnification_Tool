@@ -2224,7 +2224,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Input Image (click the center of the magnified area)</string>
+         <string>Input Image (right-click the center of the magnified area)</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

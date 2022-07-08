@@ -1134,7 +1134,7 @@ class Ui_MainWindow(object):
         self.comboBox_color2.setItemText(3, _translate("MainWindow", "blue"))
         self.comboBox_color2.setItemText(4, _translate("MainWindow", "#aabbcc"))
         self.label_22.setText(_translate("MainWindow", "Result Preview"))
-        self.label_21.setText(_translate("MainWindow", "Input Image (click the center of the magnified area)"))
+        self.label_21.setText(_translate("MainWindow", "Input Image (right-click the center of the magnified area)"))
         self.label_24.setText(_translate("MainWindow", "image name:"))
         self.label_27.setText(_translate("MainWindow", "message:"))
         self.label_25.setText(_translate("MainWindow", "Q/E:  previous/next image,    1/2/3/4:  activate \"mag 1/2/3/4\""))
