@@ -177,6 +177,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 self.check_cropresize_preview_show_image(priority)
             return
         else:
+            self.idx_image = 0
             self.image_paths = image_paths
 
         # self.image_paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open', '', '*.jpg;;*.png;;All Files(*)')
@@ -768,7 +769,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def show_image(self):
         if len(self.image_paths) > 0:
-            self.ui.lineEdit_imagename.setText(os.path.split(self.image_paths[self.idx_image])[1])
+            self.ui.lineEdit_imagename.setText(os.path.split(self.image_paths[self.idx_image])[1] + f' [{self.idx_image+1}/{len(self.image_paths)}]')
         self.show_image_in_graphicsview(self.image_resize, self.ui.graphicsView_selectarea)
         self.show_image_in_graphicsview(self.image_preview, self.ui.graphicsView_preview)
 
@@ -825,7 +826,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     else:
                         self.ui.textBrowser_message.setText('This is the last image.')
                         return
-                self.image = cv2.imread(self.image_paths[self.idx_image])
+                self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), cv2.IMREAD_COLOR)
                 self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
                 self.check_cropresize_preview_show_image('x')
 

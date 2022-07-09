@@ -38,4 +38,6 @@ python main.py
 
 After activating one magnification window, you can right-click the center of the magnified area in the right image to determine where to magnifiy. If the magnified area exceeds the range of the cropped original image, the corresponding magnification window will not display.
 
+You can also use this tool to just change the file format or adjust the resolution of the image by setting `number` to 0.
+
 If you encounter any bug or have any advice, please feel free to create an issue.
