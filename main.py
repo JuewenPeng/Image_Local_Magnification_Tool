@@ -215,7 +215,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             image_name = os.path.splitext(os.path.split(image_path)[1])[0]
             save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + self.ui.lineEdit_suffix.text())
 
-            self.image = cv2.imread(image_path)
+            self.image = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_COLOR)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
             self.check_range('x')
             self.crop_resize_image()
@@ -480,7 +480,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if self.image_resize is None:
             return
         if self.ui.spinBox_num.value() == 0:
-            self.ui.textBrowser_message.setText('')
+            self.ui.lineEdit_message.setText('')
             self.image_preview = self.image_resize
             return
 
@@ -525,7 +525,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if hMag_resize < 1 and wMag_resize < 1:
             # QtWidgets.QMessageBox.warning(self, 'Message', 'The size of the magnified areas are smaller than 1px.',
             #                               QtWidgets.QMessageBox.Ok)
-            self.ui.textBrowser_message.setText('The size of the magnification window is smaller than 1px.')
+            self.ui.lineEdit_message.setText('The size of the magnification window is smaller than 1px.')
             return
 
         h_crop, w_crop = self.image_crop.shape[:2]
@@ -683,10 +683,10 @@ class MyMainWindow(QtWidgets.QMainWindow):
             #     self.ratioOffset_history[idx_mag] = copy.deepcopy(self.ratioOffset[idx_mag])
             # elif warning_times == 1:
             #     self.ratioOffset[idx_mag] = copy.deepcopy(self.ratioOffset_history[idx_mag])
-            #     self.ui.textBrowser_message.setText(f'The position of "mag {idx_mag+1}" is out of range. Keep the previous one.')
+            #     self.ui.lineEdit_message.setText(f'The position of "mag {idx_mag+1}" is out of range. Keep the previous one.')
             # elif warning_times == 2:
             #     self.ratioOffset[idx_mag] = copy.deepcopy(self.ratioOffset_history[idx_mag])
-            #     self.ui.textBrowser_message.setText(f'The size of "mag {idx_mag + 1}" is out of range. Do not display.')
+            #     self.ui.lineEdit_message.setText(f'The size of "mag {idx_mag + 1}" is out of range. Do not display.')
             #     continue
 
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
@@ -736,9 +736,9 @@ class MyMainWindow(QtWidgets.QMainWindow):
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
 
         if warning is False:
-            self.ui.textBrowser_message.setText('Succeed to magnify.')
+            self.ui.lineEdit_message.setText('Succeed to magnify.')
         else:
-            self.ui.textBrowser_message.setText(f'Magnified areas are out of range. Do not display.')
+            self.ui.lineEdit_message.setText(f'Magnified areas are out of range. Do not display.')
 
     def show_image_in_graphicsview(self, image, graphicsView):
         if image is None:
@@ -769,7 +769,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def show_image(self):
         if len(self.image_paths) > 0:
-            self.ui.lineEdit_imagename.setText(os.path.split(self.image_paths[self.idx_image])[1] + f' [{self.idx_image+1}/{len(self.image_paths)}]')
+            self.ui.lineEdit_imagename.setText(os.path.split(self.image_paths[self.idx_image])[1])
+            self.ui.lineEdit_imageidx.setText(f'{self.idx_image+1}/{len(self.image_paths)}')
         self.show_image_in_graphicsview(self.image_resize, self.ui.graphicsView_selectarea)
         self.show_image_in_graphicsview(self.image_preview, self.ui.graphicsView_preview)
 
@@ -818,13 +819,13 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     if self.idx_image > 0:
                         self.idx_image -= 1
                     else:
-                        self.ui.textBrowser_message.setText('This is the first image.')
+                        self.ui.lineEdit_message.setText('This is the first image.')
                         return
                 elif event.key() == QtCore.Qt.Key_E:
                     if self.idx_image < length - 1:
                         self.idx_image += 1
                     else:
-                        self.ui.textBrowser_message.setText('This is the last image.')
+                        self.ui.lineEdit_message.setText('This is the last image.')
                         return
                 self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), cv2.IMREAD_COLOR)
                 self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
@@ -865,30 +866,30 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 if self.ui.spinBox_num.value() > 0:
                     if not self.ui.pushButton_position1.isChecked():
                         self.ui.pushButton_position1.setChecked(True)
-                        self.ui.textBrowser_message.setText('"mag 1" is activated.')
+                        self.ui.lineEdit_message.setText('"mag 1" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 1" is disabled.')
+                    self.ui.lineEdit_message.setText('"mag 1" is disabled.')
             elif event.key() == QtCore.Qt.Key_2:
                 if self.ui.spinBox_num.value() > 1:
                     if not self.ui.pushButton_position2.isChecked():
                         self.ui.pushButton_position2.setChecked(True)
-                        self.ui.textBrowser_message.setText('"mag 2" is activated.')
+                        self.ui.lineEdit_message.setText('"mag 2" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 2" is disabled.')
+                    self.ui.lineEdit_message.setText('"mag 2" is disabled.')
             elif event.key() == QtCore.Qt.Key_3:
                 if self.ui.spinBox_num.value() > 2:
                     if not self.ui.pushButton_position3.isChecked():
                         self.ui.pushButton_position3.setChecked(True)
-                        self.ui.textBrowser_message.setText('"mag 3" is activated.')
+                        self.ui.lineEdit_message.setText('"mag 3" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 3" is disabled.')
+                    self.ui.lineEdit_message.setText('"mag 3" is disabled.')
             else:
                 if self.ui.spinBox_num.value() > 3:
                     if not self.ui.pushButton_position4.isChecked():
                         self.ui.pushButton_position4.setChecked(True)
-                        self.ui.textBrowser_message.setText('"mag 4" is activated.')
+                        self.ui.lineEdit_message.setText('"mag 4" is activated.')
                 else:
-                    self.ui.textBrowser_message.setText('"mag 4" is disabled.')
+                    self.ui.lineEdit_message.setText('"mag 4" is disabled.')
 
         elif event.key() == QtCore.Qt.Key_Escape:
             items = self.ui.centralwidget.findChildren(QtWidgets.QWidget)
@@ -902,15 +903,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 if self.idx_image > 0:
                     self.idx_image -= 1
                 else:
-                    self.ui.textBrowser_message.setText('This is the first image.')
+                    self.ui.lineEdit_message.setText('This is the first image.')
                     return
             elif event.angleDelta().y() < 0:
                 if self.idx_image < length - 1:
                     self.idx_image += 1
                 else:
-                    self.ui.textBrowser_message.setText('This is the last image.')
+                    self.ui.lineEdit_message.setText('This is the last image.')
                     return
-            self.image = cv2.imread(self.image_paths[self.idx_image])
+            self.image = cv2.imdecode(np.fromfile(self.image_paths[self.idx_image], dtype=np.uint8), cv2.IMREAD_COLOR)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
             self.check_cropresize_preview_show_image('x')
 
