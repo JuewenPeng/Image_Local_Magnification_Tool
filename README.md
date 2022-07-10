@@ -40,4 +40,4 @@ After activating one magnification window, you can right-click the center of the
 
 You can also use this tool to just change the file format or adjust the resolution of the image by setting `number` to 0.
 
-If you encounter any bug or have any advice, please feel free to create an issue.
+If you encounter any bugs or have any advice, please feel free to create an issue.
