@@ -269,6 +269,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.lineEdit_ratio.setText('1.5')
         self.ui.lineEdit_magnification.setText('4.0')
         self.ui.spinBox_num.setValue(2)
+        self.ui.comboBox_position.setCurrentIndex(1)
         self.ui.pushButton_position1.setChecked(True)
         # self.ui.comboBox_color1.setCurrentIndex(0)
         # self.ui.comboBox_color2.setCurrentIndex(1)
@@ -532,6 +533,9 @@ class MyMainWindow(QtWidgets.QMainWindow):
         wMag_crop = w_crop / w_resize * wMag_resize
         hMag_crop = h_crop / h_resize * hMag_resize
 
+        if wMag_resize + 2 * linewidthHalf > w_resize or hMag_resize + 2 * linewidthHalf > h_resize:
+            self.ui.lineEdit_message.setText(f'Magnified areas are out of range. Do not display.')
+
         self.image_preview = 255 * np.ones((h_preview, w_preview, 3))
 
         # draw original image
@@ -568,8 +572,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         xEnd = xStart + w_resize
         yEnd = yStart + h_resize
         self.image_preview[yStart: yEnd, xStart: xEnd] = self.image_resize
-
-        warning = False
 
         for idx_mag in range(self.ui.spinBox_num.value()):
 
@@ -614,6 +616,27 @@ class MyMainWindow(QtWidgets.QMainWindow):
             xCenter = w_resize * ratioRelativeOffsetX
             yCenter = h_resize * ratioRelativeOffsetY
 
+            beyond_boundary = False
+            if xCenter - wMag_resize // 2 < linewidthHalf:
+                beyond_boundary = True
+                xCenter = linewidthHalf + wMag_resize // 2
+            elif xCenter + wMag_resize // 2 > w_resize - linewidthHalf:
+                xCenter = w_resize - linewidthHalf - wMag_resize // 2
+                beyond_boundary = True
+            if yCenter - wMag_resize // 2 < linewidthHalf:
+                yCenter = linewidthHalf + hMag_resize // 2
+                beyond_boundary = True
+            elif yCenter + hMag_resize // 2 > h_resize - linewidthHalf:
+                yCenter = h_resize - linewidthHalf - hMag_resize // 2
+                beyond_boundary = True
+
+            if beyond_boundary is True:
+                ratioRelativeOffsetX = xCenter / w_resize
+                ratioRelativeOffsetY = yCenter / h_resize
+                ratioOffsetY = ratioCropTop + ratioRelativeOffsetY * (1 - ratioCropTop - ratioCropBottom)
+                ratioOffsetX = ratioCropLeft + ratioRelativeOffsetX * (1 - ratioCropLeft - ratioCropRight)
+                self.ratioOffset[idx_mag] = [ratioOffsetY, ratioOffsetX]
+
             if numMag > 1:
                 if position == 0:
                     xStart = int(xCenter - wMag_resize//2) + (w_preview - w_resize) // 2
@@ -644,34 +667,30 @@ class MyMainWindow(QtWidgets.QMainWindow):
             xEnd = int(xStart + wMag_resize)
             yEnd = int(yStart + hMag_resize)
 
-            if wMag_resize + 2 * linewidthHalf > w_resize or hMag_resize + 2 * linewidthHalf > h_resize:
-                warning = True
-                continue
-
-            if xStart < linewidthHalf or xEnd > w_resize-linewidthHalf or yStart < linewidthHalf or yEnd > h_resize-linewidthHalf:
-                if xStart < linewidthHalf:
-                    xStart = linewidthHalf
-                    xEnd = int(xStart + wMag_resize)
-                    xCenter = xStart + wMag_resize / 2
-                elif xEnd > w_resize - linewidthHalf:
-                    xEnd = w_resize - linewidthHalf
-                    xStart = int(xEnd - wMag_resize)
-                    xCenter = xEnd - wMag_resize / 2
-                if yStart < linewidthHalf:
-                    yStart = linewidthHalf
-                    yEnd = int(yStart + hMag_resize)
-                    yCenter = yStart + hMag_resize / 2
-                elif yEnd > h_resize - linewidthHalf:
-                    yEnd = h_resize - linewidthHalf
-                    yStart = int(yEnd - hMag_resize)
-                    yCenter = yEnd - hMag_resize / 2
-
-                ratioRelativeOffsetX = xCenter / w_resize
-                ratioRelativeOffsetY = yCenter / h_resize
-
-                ratioOffsetY = ratioCropTop + ratioRelativeOffsetY * (1 - ratioCropTop - ratioCropBottom)
-                ratioOffsetX = ratioCropLeft + ratioRelativeOffsetX * (1 - ratioCropLeft - ratioCropRight)
-                self.ratioOffset[idx_mag] = [ratioOffsetY, ratioOffsetX]
+            # if xStart < linewidthHalf or xEnd > w_resize-linewidthHalf or yStart < linewidthHalf or yEnd > h_resize-linewidthHalf:
+            #     if xStart < linewidthHalf:
+            #         xStart = linewidthHalf
+            #         xEnd = int(xStart + wMag_resize)
+            #         xCenter = xStart + wMag_resize / 2
+            #     elif xEnd > w_resize - linewidthHalf:
+            #         xEnd = w_resize - linewidthHalf
+            #         xStart = int(xEnd - wMag_resize)
+            #         xCenter = xEnd - wMag_resize / 2
+            #     if yStart < linewidthHalf:
+            #         yStart = linewidthHalf
+            #         yEnd = int(yStart + hMag_resize)
+            #         yCenter = yStart + hMag_resize / 2
+            #     elif yEnd > h_resize - linewidthHalf:
+            #         yEnd = h_resize - linewidthHalf
+            #         yStart = int(yEnd - hMag_resize)
+            #         yCenter = yEnd - hMag_resize / 2
+            #
+            #     ratioRelativeOffsetX = xCenter / w_resize
+            #     ratioRelativeOffsetY = yCenter / h_resize
+            #
+            #     ratioOffsetY = ratioCropTop + ratioRelativeOffsetY * (1 - ratioCropTop - ratioCropBottom)
+            #     ratioOffsetX = ratioCropLeft + ratioRelativeOffsetX * (1 - ratioCropLeft - ratioCropRight)
+            #     self.ratioOffset[idx_mag] = [ratioOffsetY, ratioOffsetX]
 
                 # if xStart < linewidthHalf or yStart < linewidthHalf or xEnd > w_resize-linewidthHalf or yEnd > h_resize-linewidthHalf:
                 #     warning_times += 1
@@ -735,10 +754,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.image_preview[yStart: yEnd, xStart: xEnd] = mag_resize
             cv2.rectangle(self.image_preview, (xStart, yStart), (xEnd-1, yEnd-1), color, thickness=linewidth)
 
-        if warning is False:
-            self.ui.lineEdit_message.setText('Succeed to magnify.')
-        else:
-            self.ui.lineEdit_message.setText(f'Magnified areas are out of range. Do not display.')
+        self.ui.lineEdit_message.setText('Succeed to magnify.')
 
     def show_image_in_graphicsview(self, image, graphicsView):
         if image is None:
