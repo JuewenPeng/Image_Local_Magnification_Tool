@@ -204,7 +204,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         image_path = self.image_paths[0]
         image_name = os.path.splitext(os.path.split(image_path)[1])[0]
-        save_path = os.path.join(self.save_dir, self.ui.lineEdit_prefix.text() + image_name + '.json')
+        save_path = os.path.join(self.save_dir, image_name + '.json')
         with open(save_path, 'w', encoding='utf-8') as fw:
             json.dump(ckpt, fw, indent=4, ensure_ascii=False)
 

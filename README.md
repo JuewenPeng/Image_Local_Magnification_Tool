@@ -17,8 +17,8 @@ python main.py
 
 - `upload` : upload one or several images; upload checkpoint file (".json") to restore previous settings
 - `save` : choose the diretory to save results and checkpoint file
-  - `prefix` : text added to the beginning of the original image name (e.g. "mag_")
-  - `suffix` : image file format added to the end of the original image name (e.g. ".jpg")
+  - `prefix` : text added to the beginning of the original image name (e.g. "mag_" or "")
+  - `suffix` : text (including image file format) added to the end of the original image name (e.g. ".jpg" or "_mag.jpg")
 - `reset` : reset all settings
 - `resolution-x/y` (range: 128~4096px, aspect ratio is preserved): resolution of the processed image (do not consider the magnification windows)
 - `crop top/bottom/left/down` (range: 0~80%): crop ratio
