@@ -249,7 +249,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def reset(self, ckpt_path=None):
         if not ckpt_path:
-            reply = QtWidgets.QMessageBox.question(self, 'Message', 'Aro you sure to reset?',
+            reply = QtWidgets.QMessageBox.question(self, 'Message', 'Are you sure to reset?',
                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                    QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.No:
