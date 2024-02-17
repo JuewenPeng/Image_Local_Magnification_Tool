@@ -310,28 +310,28 @@ class MyMainWindow(QtWidgets.QMainWindow):
         # crop ratio
         if self.ui.spinBox_cropTop.value() < 0:
             self.ui.spinBox_cropTop.setValue(0)
-        elif self.ui.spinBox_cropTop.value() > 80:
-            self.ui.spinBox_cropTop.setValue(80)
+        elif self.ui.spinBox_cropTop.value() > 95:
+            self.ui.spinBox_cropTop.setValue(95)
 
         if self.ui.spinBox_cropBottom.value() < 0:
             self.ui.spinBox_cropBottom.setValue(0)
-        elif self.ui.spinBox_cropBottom.value() > 80:
-            self.ui.spinBox_cropBottom.setValue(80)
+        elif self.ui.spinBox_cropBottom.value() > 95:
+            self.ui.spinBox_cropBottom.setValue(95)
 
         if self.ui.spinBox_cropLeft.value() < 0:
             self.ui.spinBox_cropLeft.setValue(0)
-        elif self.ui.spinBox_cropLeft.value() > 80:
-            self.ui.spinBox_cropLeft.setValue(80)
+        elif self.ui.spinBox_cropLeft.value() > 95:
+            self.ui.spinBox_cropLeft.setValue(95)
 
         if self.ui.spinBox_cropRight.value() < 0:
             self.ui.spinBox_cropRight.setValue(0)
-        elif self.ui.spinBox_cropRight.value() > 80:
-            self.ui.spinBox_cropRight.setValue(80)
+        elif self.ui.spinBox_cropRight.value() > 95:
+            self.ui.spinBox_cropRight.setValue(95)
 
-        if self.ui.spinBox_cropTop.value() + self.ui.spinBox_cropBottom.value() > 90:
-            self.ui.spinBox_cropBottom.setValue(90 - self.ui.spinBox_cropTop.value())
-        elif self.ui.spinBox_cropLeft.value() + self.ui.spinBox_cropRight.value() > 90:
-            self.ui.spinBox_cropRight.setValue(90 - self.ui.spinBox_cropLeft.value())
+        if self.ui.spinBox_cropTop.value() + self.ui.spinBox_cropBottom.value() > 95:
+            self.ui.spinBox_cropBottom.setValue(95 - self.ui.spinBox_cropTop.value())
+        elif self.ui.spinBox_cropLeft.value() + self.ui.spinBox_cropRight.value() > 95:
+            self.ui.spinBox_cropRight.setValue(95 - self.ui.spinBox_cropLeft.value())
 
 
         if self.image is not None:
@@ -347,7 +347,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     resX = round(w_crop / h_crop * resY)
                 elif resY > 4096:
                     resY = 4096
-                    resX = round(w / h * resY)
+                    resX = round(w_crop / h_crop * resY)
             else:
                 resX = round(w_crop / h_crop * self.ui.spinBox_resY.value())
                 if resX < 128:
